@@ -16,7 +16,7 @@ export const EMPTY_DRAFT: DraftTrade = {
 export function createEmptySession(): AppSession {
   return {
     selectedStock: null,
-    initialCash: "",
+    initialCash: "1000000",
     cashLocked: false,
     calculateFees: false,
     commissionRatePercent: "0.025",

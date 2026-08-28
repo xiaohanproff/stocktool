@@ -338,6 +338,14 @@ select {
   font-variant-numeric: tabular-nums;
 }
 
+.stat-value.pnl-up {
+  color: #dc2626;
+}
+
+.stat-value.pnl-down {
+  color: #16a34a;
+}
+
 .summary-note {
   margin-top: auto;
 }

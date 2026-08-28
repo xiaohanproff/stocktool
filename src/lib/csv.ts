@@ -16,7 +16,9 @@ export function buildTradesCsv(
   snapshot: PortfolioSnapshot,
 ): string {
   const lines: string[] = [];
-  lines.push("股票代码,股票简称,初始可用现金,可用现金,持股数量,成本价");
+  lines.push(
+    "股票代码,股票简称,初始可用现金,可用现金,持股数量,成本价,持仓市值,浮动盈亏,累计已实现盈亏",
+  );
   lines.push(
     [
       stock?.code ?? "",
@@ -25,6 +27,9 @@ export function buildTradesCsv(
       snapshot.cash.toFixed(2),
       String(snapshot.shares),
       snapshot.avgCost.toFixed(2),
+      snapshot.totalValue.toFixed(2),
+      snapshot.floatingProfit.toFixed(2),
+      snapshot.realizedProfit.toFixed(2),
     ].join(","),
   );
   lines.push("");

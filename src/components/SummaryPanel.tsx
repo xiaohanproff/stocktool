@@ -9,6 +9,19 @@ export interface SummaryPanelProps {
 }
 
 /**
+ * 盈亏数值的样式类：正红负绿（A 股习惯），零或空无着色。
+ *
+ * @param value 盈亏金额；null 表示不展示
+ * @returns CSS className 片段
+ */
+function pnlClass(value: number | null): string {
+  if (value === null || value === 0) {
+    return "";
+  }
+  return value > 0 ? "pnl-up" : "pnl-down";
+}
+
+/**
  * 右侧持仓汇总与导出。
  *
  * @param props 组件属性
@@ -45,7 +58,43 @@ export function SummaryPanel({
               : "—"}
         </div>
       </div>
-      <p className="hint summary-note">自填价格记账，无实时行情</p>
+      <div className="stat">
+        <div className="stat-label">持股市值</div>
+        <div className="stat-value">
+          {hasInitialCash && snapshot.shares > 0
+            ? formatMoney(snapshot.totalValue)
+            : hasInitialCash
+              ? "—"
+              : "—"}
+        </div>
+      </div>
+      <div className="stat">
+        <div className="stat-label">累计已实现盈亏</div>
+        <div
+          className={`stat-value ${pnlClass(hasInitialCash ? snapshot.realizedProfit : null)}`}
+        >
+          {hasInitialCash ? formatMoney(snapshot.realizedProfit) : "—"}
+        </div>
+      </div>
+      <div className="stat">
+        <div className="stat-label">浮动盈亏</div>
+        <div
+          className={`stat-value ${pnlClass(
+            hasInitialCash && snapshot.shares > 0
+              ? snapshot.floatingProfit
+              : null,
+          )}`}
+        >
+          {hasInitialCash && snapshot.shares > 0
+            ? formatMoney(snapshot.floatingProfit)
+            : hasInitialCash
+              ? "—"
+              : "—"}
+        </div>
+      </div>
+      <p className="hint summary-note">
+        市值与浮动盈亏按最近成交价估算，无实时行情
+      </p>
       <button
         type="button"
         className="btn btn-secondary export-btn"

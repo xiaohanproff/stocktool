@@ -53,4 +53,10 @@ export interface PortfolioSnapshot {
   shares: number;
   /** 加权平均成本；无持股时为 0。 */
   avgCost: number;
+  /** 持仓市值：持股 × 最近成交价（无实时行情）。 */
+  totalValue: number;
+  /** 浮动盈亏：市值 − 持股 × 成本价。 */
+  floatingProfit: number;
+  /** 累计已实现盈亏：历次卖出净收入相对成本的盈亏之和。 */
+  realizedProfit: number;
 }

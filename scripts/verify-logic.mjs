@@ -36,6 +36,9 @@ function computePortfolio(initialCash, trades) {
   let cash = initialCash;
   let shares = 0;
   let avgCost = 0;
+  let realizedProfit = 0;
+  let lastPrice = 0;
+
   for (const trade of trades) {
     const feeSum = totalFees(trade.fees);
     if (trade.side === "buy") {
@@ -43,16 +46,27 @@ function computePortfolio(initialCash, trades) {
       const costBasis = shares * avgCost + trade.amount + feeSum;
       shares += trade.quantity;
       avgCost = shares > 0 ? roundMoney(costBasis / shares) : 0;
+      lastPrice = trade.price;
     } else {
+      const costOfSold = roundMoney(avgCost * trade.quantity);
+      const netProceeds = roundMoney(trade.amount - feeSum);
+      realizedProfit = roundMoney(realizedProfit + netProceeds - costOfSold);
       cash = roundMoney(cash + trade.amount - feeSum);
       shares -= trade.quantity;
+      lastPrice = trade.price;
       if (shares <= 0) {
         shares = 0;
         avgCost = 0;
       }
     }
   }
-  return { cash, shares, avgCost };
+
+  const totalValue =
+    shares > 0 && lastPrice > 0 ? roundMoney(shares * lastPrice) : 0;
+  const floatingProfit =
+    shares > 0 ? roundMoney(totalValue - shares * avgCost) : 0;
+
+  return { cash, shares, avgCost, totalValue, floatingProfit, realizedProfit };
 }
 
 function assert(cond, msg) {
@@ -70,12 +84,14 @@ const snap = computePortfolio(100000, [
   {
     side: "buy",
     quantity: 1000,
+    price: 8.5,
     amount: 8500,
     fees: buyFees,
   },
   {
     side: "sell",
     quantity: 200,
+    price: 9.2,
     amount: 1840,
     fees: sellFees,
   },
@@ -84,17 +100,27 @@ const snap = computePortfolio(100000, [
 assert(snap.shares === 800, `持股应为 800，实际 ${snap.shares}`);
 assert(snap.cash === 93328.97, `现金应为 93328.97，实际 ${snap.cash}`);
 assert(snap.avgCost === 8.51, `成本应为 8.51，实际 ${snap.avgCost}`);
+assert(snap.totalValue === 7360, `市值应为 7360，实际 ${snap.totalValue}`);
+assert(snap.floatingProfit === 552, `浮动盈亏应为 552，实际 ${snap.floatingProfit}`);
+assert(
+  snap.realizedProfit === 132.06,
+  `已实现盈亏应为 132.06，实际 ${snap.realizedProfit}`,
+);
 
 const noFee = computePortfolio(100000, [
   {
     side: "buy",
     quantity: 1000,
+    price: 8.5,
     amount: 8500,
     fees: calcFees("buy", 8500, false, 0.025),
   },
 ]);
 assert(noFee.cash === 91500, `不计手续费现金应为 91500，实际 ${noFee.cash}`);
 assert(noFee.avgCost === 8.5, `不计手续费成本应为 8.5，实际 ${noFee.avgCost}`);
+assert(noFee.totalValue === 8500, `不计手续费市值应为 8500，实际 ${noFee.totalValue}`);
+assert(noFee.floatingProfit === 0, `买入后同价估值浮动应为 0，实际 ${noFee.floatingProfit}`);
+assert(noFee.realizedProfit === 0, "仅买入时已实现应为 0");
 
 console.log("verify-logic: OK");
 console.log(JSON.stringify({ withFees: snap, noFee }, null, 2));
