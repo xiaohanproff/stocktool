@@ -57,3 +57,10 @@ export function loadSession(): AppSession {
 export function saveSession(session: AppSession): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
 }
+
+/**
+ * 清除持久化会话（重置时调用）。
+ */
+export function clearSession(): void {
+  localStorage.removeItem(STORAGE_KEY);
+}

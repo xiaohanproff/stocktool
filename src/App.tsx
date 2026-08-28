@@ -6,7 +6,13 @@ import { buildTradesCsv, downloadCsv } from "./lib/csv";
 import { calcFees, roundMoney } from "./lib/fees";
 import { computePortfolio, validateTrade } from "./lib/portfolio";
 import { stockCount } from "./lib/stocks";
-import { EMPTY_DRAFT, loadSession, saveSession } from "./lib/storage";
+import {
+  EMPTY_DRAFT,
+  clearSession,
+  createEmptySession,
+  loadSession,
+  saveSession,
+} from "./lib/storage";
 import type { AppSession, ConfirmedTrade, DraftTrade, StockInfo } from "./types";
 
 /**
@@ -182,6 +188,21 @@ export default function App() {
     downloadCsv(`${code}-trades.csv`, csv);
   }
 
+  /**
+   * 重置全部记账数据（需二次确认）。
+   */
+  function handleReset(): void {
+    const ok = window.confirm(
+      "确定要重置吗？将清除已选股票、初始现金、全部操作记录与本地保存，此操作不可撤销。",
+    );
+    if (!ok) {
+      return;
+    }
+    clearSession();
+    setSession(createEmptySession());
+    setError(null);
+  }
+
   return (
     <div className="app">
       <header className="top-bar">
@@ -265,6 +286,7 @@ export default function App() {
           hasInitialCash={hasInitialCash}
           onExport={handleExport}
           canExport={hasInitialCash && session.trades.length > 0}
+          onReset={handleReset}
         />
       </main>
     </div>

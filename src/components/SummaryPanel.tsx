@@ -6,6 +6,8 @@ export interface SummaryPanelProps {
   hasInitialCash: boolean;
   onExport: () => void;
   canExport: boolean;
+  /** 重置全部数据（调用方须先 window.confirm）。 */
+  onReset: () => void;
 }
 
 /**
@@ -32,6 +34,7 @@ export function SummaryPanel({
   hasInitialCash,
   onExport,
   canExport,
+  onReset,
 }: SummaryPanelProps) {
   return (
     <aside className="summary-panel">
@@ -102,6 +105,13 @@ export function SummaryPanel({
         onClick={onExport}
       >
         导出 CSV
+      </button>
+      <button
+        type="button"
+        className="btn btn-reset reset-btn"
+        onClick={onReset}
+      >
+        重置
       </button>
     </aside>
   );

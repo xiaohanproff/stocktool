@@ -286,6 +286,16 @@ select {
   border-color: #fecaca;
 }
 
+.btn-reset {
+  background: #dc2626;
+  color: #fff;
+  border-color: #b91c1c;
+}
+
+.btn-reset:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
 .btn-secondary {
   background: #fff;
   border-color: var(--border);
@@ -350,7 +360,8 @@ select {
   margin-top: auto;
 }
 
-.export-btn {
+.export-btn,
+.reset-btn {
   width: 100%;
   margin-top: 8px;
   padding: 10px 12px;
